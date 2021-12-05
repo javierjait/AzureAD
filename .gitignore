@@ -1,0 +1,10 @@
+*.exe
+*.log
+*.pem
+*.yaml
+*.json
+*.cmd
+*.zip
+azuread
+
+vendor/
