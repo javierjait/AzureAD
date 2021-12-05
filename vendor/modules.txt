@@ -1,0 +1,43 @@
+# github.com/AzureAD/microsoft-authentication-library-for-go v0.3.1
+## explicit
+github.com/AzureAD/microsoft-authentication-library-for-go/apps/cache
+github.com/AzureAD/microsoft-authentication-library-for-go/apps/errors
+github.com/AzureAD/microsoft-authentication-library-for-go/apps/internal/base
+github.com/AzureAD/microsoft-authentication-library-for-go/apps/internal/base/internal/storage
+github.com/AzureAD/microsoft-authentication-library-for-go/apps/internal/json
+github.com/AzureAD/microsoft-authentication-library-for-go/apps/internal/json/types/time
+github.com/AzureAD/microsoft-authentication-library-for-go/apps/internal/local
+github.com/AzureAD/microsoft-authentication-library-for-go/apps/internal/oauth
+github.com/AzureAD/microsoft-authentication-library-for-go/apps/internal/oauth/ops
+github.com/AzureAD/microsoft-authentication-library-for-go/apps/internal/oauth/ops/accesstokens
+github.com/AzureAD/microsoft-authentication-library-for-go/apps/internal/oauth/ops/authority
+github.com/AzureAD/microsoft-authentication-library-for-go/apps/internal/oauth/ops/internal/comm
+github.com/AzureAD/microsoft-authentication-library-for-go/apps/internal/oauth/ops/internal/grant
+github.com/AzureAD/microsoft-authentication-library-for-go/apps/internal/oauth/ops/wstrust
+github.com/AzureAD/microsoft-authentication-library-for-go/apps/internal/oauth/ops/wstrust/defs
+github.com/AzureAD/microsoft-authentication-library-for-go/apps/internal/shared
+github.com/AzureAD/microsoft-authentication-library-for-go/apps/internal/version
+github.com/AzureAD/microsoft-authentication-library-for-go/apps/public
+# github.com/golang-jwt/jwt v3.2.1+incompatible
+github.com/golang-jwt/jwt
+# github.com/google/uuid v1.1.1
+github.com/google/uuid
+# github.com/kylelemons/godebug v1.1.0
+github.com/kylelemons/godebug/diff
+github.com/kylelemons/godebug/pretty
+# github.com/nmcclain/asn1-ber v0.0.0-20170104154839-2661553a0484
+github.com/nmcclain/asn1-ber
+# github.com/nmcclain/ldap v0.0.0-20210720162743-7f8d1e44eeba
+## explicit
+github.com/nmcclain/ldap
+# github.com/open-networks/go-msgraph v0.2.1
+## explicit
+github.com/open-networks/go-msgraph
+# github.com/pkg/browser v0.0.0-20210115035449-ce105d075bb4
+github.com/pkg/browser
+# golang.org/x/sys v0.0.0-20210124154548-22da62e12c0c
+golang.org/x/sys/internal/unsafeheader
+golang.org/x/sys/windows
+# gopkg.in/yaml.v2 v2.4.0
+## explicit
+gopkg.in/yaml.v2
