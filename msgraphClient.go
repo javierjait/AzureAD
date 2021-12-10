@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/javierjait/azuread/util"
@@ -13,36 +14,9 @@ var graphUsers struct {
 	timestamp time.Time
 }
 
-/*func getUsers() (msgraph.Users, error) {
-	client, err := graphClient(appConfig.Azure)
-
-	if err != nil {
-		util.AddToLog("error", fmt.Sprint("Credentials are probably wrong or system time is not synced: ", err))
-		return msgraph.Users{}, err
-	}
-
-	return client.ListUsers(msgraph.ListWithSelect("ID, businessPhones, displayName, givenName, mail, mobilePhone, preferredLanguage, surname, userPrincipalName, activePhone, employeeId"))
-}
-
-func getUser(id string) (msgraph.User, error) {
-	users, err := getUsers()
-	if err == nil {
-		for _, v := range users {
-			if id == v.EmployeeID {
-				return v, nil
-			}
-		}
-	}
-
-	return msgraph.User{}, errors.New("not found")
-}*/
-
 func getUsersMap() ([]map[string]interface{}, error) {
 	now := time.Now().UTC()
-	//log.Printf("Now: %s, Check: %s, Timestamp: %s", now, now.Add(time.Duration(-appConfig.Azure.Cache)*time.Minute), graphUsers.timestamp)
-	//log.Print(now.Add(time.Duration(-appConfig.Azure.Cache) * time.Minute).After(graphUsers.timestamp))
 	if now.Add(time.Duration(-appConfig.Azure.Cache) * time.Minute).After(graphUsers.timestamp) {
-		//log.Print("get from API")
 		client, err := graphClient(appConfig.Azure)
 
 		if err != nil {
@@ -50,7 +24,8 @@ func getUsersMap() ([]map[string]interface{}, error) {
 			return nil, err
 		}
 
-		users, err := client.ListUsersMap(msgraph.ListWithSelect("ID, businessPhones, displayName, givenName, mail, mobilePhone, preferredLanguage, surname, userPrincipalName, activePhone, employeeId"))
+		/*msgraph.ListWithSelect("ID, businessPhones, displayName, givenName, mail, mobilePhone, preferredLanguage, surname, userPrincipalName, activePhone, employeeId")*/
+		users, err := client.ListUsersMap(msgraph.ListWithSelect(generateSelect()))
 		if err == nil {
 			graphUsers.users = users
 			graphUsers.timestamp = now
@@ -59,9 +34,20 @@ func getUsersMap() ([]map[string]interface{}, error) {
 		return users, err
 	}
 
-	//log.Print("get from memory")
-
 	return graphUsers.users, nil
+}
+
+func generateSelect() string {
+	selFields := []string{"userPrincipalName"}
+
+	for _, v := range appConfig.mapFields {
+		if !util.FindInSlice(v, selFields) {
+			selFields = append(selFields, v)
+
+		}
+	}
+
+	return strings.Join(selFields, ",")
 }
 
 func graphClient(config azureConfigType) (*msgraph.GraphClient, error) {

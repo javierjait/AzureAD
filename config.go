@@ -29,6 +29,7 @@ type configType struct {
 	LDAP      ldapConfigType      `yaml:"LDAP"`
 	MapAux    []map[string]string `yaml:"Mapping"`
 	mapFields map[string]string   // key ldapfield, value azureField
+	//mapFields map[string][]string
 }
 
 func getConfig() (t configType) {
@@ -37,9 +38,11 @@ func getConfig() (t configType) {
 	validateConfig(&t)
 
 	t.mapFields = make(map[string]string)
+	//t.mapFields = make(map[string][]string)
 	for _, v := range t.MapAux {
 		for k, m := range v {
 			t.mapFields[k] = m
+			//t.mapFields[k] = append(t.mapFields[k], m)
 		}
 	}
 

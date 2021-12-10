@@ -21,3 +21,13 @@ func AddToLog(tipo string, msg interface{}) {
 		log.Print(err)
 	}
 }
+
+func FindInSlice(value string, slice []string) bool {
+	for _, v := range slice {
+		if v == value {
+			return true
+		}
+	}
+
+	return false
+}

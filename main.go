@@ -11,6 +11,8 @@ var appConfig configType
 
 func main() {
 	appConfig = getConfig()
+	//log.Printf("%+v", appConfig)
+	//os.Exit(1)
 
 	s := ldap.NewServer()
 	handler := ldapHandler{}
@@ -20,7 +22,7 @@ func main() {
 	s.CloseFunc("", handler)
 
 	if appConfig.LDAP.Secure {
-		if err := s.ListenAndServeTLS(fmt.Sprintf(":%d", appConfig.LDAP.Port), "cert.pem", "key.pem"); err != nil {
+		if err := s.ListenAndServeTLS(fmt.Sprintf(":%d", appConfig.LDAP.Port), fmt.Sprintf("%scert.pem", appConfig.LDAP.CertificateDirectory), fmt.Sprintf("%skey.pem", appConfig.LDAP.CertificateDirectory)); err != nil {
 			log.Fatalf("LDAP Server Failed: %s", err.Error())
 		}
 	} else {
