@@ -42,24 +42,34 @@ func (h ldapHandler) Search(boundDN string, searchReq ldap.SearchRequest, conn n
 			var entries []*ldap.Entry
 
 			for _, u := range usersFound {
-				var mail []string
+				var userName, domain string
+
+				/*var mail []string
 				userPrincipalName, ok := u["userPrincipalName"].(string)
 				if ok {
 					mail = strings.Split(userPrincipalName, "@")
+				}*/
+				azureValue, ok := getAzureValue(u, "userPrincipalName")
+				if ok {
+					switch upn := azureValue.(type) {
+					case string:
+						//mail = strings.Split(upn, "@")
+						userName, domain = getUsernameDomain(upn)
+					}
 				}
 
-				if len(mail) > 0 {
-					baseDN := getDN(mail[1])
+				if userName != "" && domain != "" {
+					//baseDN := getDN(mail[1])
+					baseDN := getDN(domain)
 					var entry ldap.Entry
 
-					entry.DN = fmt.Sprintf("cn=%s,%s", mail[0], baseDN)
-					//entry.Attributes = append(entry.Attributes, &ldap.EntryAttribute{Name: "username", Values: []string{mail[0]}})
-					//entry.Attributes = append(entry.Attributes, &ldap.EntryAttribute{Name: "mail", Values: []string{userPrincipalName}})
-					//entry.Attributes = append(entry.Attributes, &ldap.EntryAttribute{Name: "objectClass", Values: []string{"person"}})
-					for k, value := range u {
-						ldapFields := getLDAPFields(k)
+					//entry.DN = fmt.Sprintf("cn=%s,%s", mail[0], baseDN)
+					entry.DN = fmt.Sprintf("cn=%s,%s", userName, baseDN)
+					for azureField := range u {
+						ldapFields := getLDAPFields(azureField)
+						azureValue, _ := getAzureValue(u, azureField)
 						for _, ldapName := range ldapFields {
-							switch v := value.(type) {
+							switch v := azureValue.(type) {
 							case string:
 								entry.Attributes = append(entry.Attributes, &ldap.EntryAttribute{Name: ldapName, Values: []string{v}})
 							default:
@@ -108,6 +118,12 @@ func getAzureField(ldapField string) string {
 	}
 
 	return ""
+}
+
+func getAzureValue(user map[string]interface{}, azureField string) (value interface{}, ok bool) {
+	value, ok = user[azureField]
+
+	return
 }
 
 func findUsers(filter []string, searchType byte) (usersFound []map[string]interface{}) {
@@ -313,6 +329,16 @@ func getDN(domain string) (baseDN string) {
 			baseDN += fmt.Sprintf("dc=%s,", v)
 		}
 		baseDN = strings.TrimSuffix(baseDN, ",")
+	}
+
+	return
+}
+
+func getUsernameDomain(mail string) (user, domain string) {
+	mailSlice := strings.Split(mail, "@")
+	if len(mailSlice) == 2 {
+		user = mailSlice[0]
+		domain = mailSlice[1]
 	}
 
 	return

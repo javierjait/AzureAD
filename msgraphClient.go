@@ -43,7 +43,6 @@ func generateSelect() string {
 	for _, v := range appConfig.mapFields {
 		if !util.FindInSlice(v, selFields) {
 			selFields = append(selFields, v)
-
 		}
 	}
 
