@@ -1,6 +1,8 @@
 package main
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestGetUserName(t *testing.T) {
 	/*expectedUser := "javierjait"
@@ -28,5 +30,26 @@ func TestGetConfig(t *testing.T) {
 	appConfig = getConfig()
 	if appConfig.Azure.ApplicationID == "" {
 		t.Errorf("GetConfig failed. AppConfig %+v", appConfig)
+	}
+}
+
+func TestGetUsernameDomain(t *testing.T) {
+	type gud struct {
+		mail   string
+		user   string
+		domain string
+	}
+	var testGud []gud
+	testGud = append(testGud, gud{"", "", ""})
+	testGud = append(testGud, gud{"javierjait@yahoo.com", "javierjait", "yahoo.com"})
+	testGud = append(testGud, gud{"test@test.com", "test", "test.com"})
+	testGud = append(testGud, gud{"@test.com", "", ""})
+	testGud = append(testGud, gud{"test.com", "", ""})
+
+	for _, v := range testGud {
+		u, d := getUsernameDomain(v.mail)
+		if u != v.user || d != v.domain {
+			t.Errorf("getUsernameDomain error. Expected u: %s, d: %s. Got u: %s, d: %s", v.user, v.domain, u, d)
+		}
 	}
 }

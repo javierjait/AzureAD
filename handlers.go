@@ -44,26 +44,18 @@ func (h ldapHandler) Search(boundDN string, searchReq ldap.SearchRequest, conn n
 			for _, u := range usersFound {
 				var userName, domain string
 
-				/*var mail []string
-				userPrincipalName, ok := u["userPrincipalName"].(string)
-				if ok {
-					mail = strings.Split(userPrincipalName, "@")
-				}*/
 				azureValue, ok := getAzureValue(u, "userPrincipalName")
 				if ok {
 					switch upn := azureValue.(type) {
 					case string:
-						//mail = strings.Split(upn, "@")
 						userName, domain = getUsernameDomain(upn)
 					}
 				}
 
 				if userName != "" && domain != "" {
-					//baseDN := getDN(mail[1])
 					baseDN := getDN(domain)
 					var entry ldap.Entry
 
-					//entry.DN = fmt.Sprintf("cn=%s,%s", mail[0], baseDN)
 					entry.DN = fmt.Sprintf("cn=%s,%s", userName, baseDN)
 					for azureField := range u {
 						ldapFields := getLDAPFields(azureField)
@@ -94,21 +86,6 @@ func (h ldapHandler) Search(boundDN string, searchReq ldap.SearchRequest, conn n
 
 	return ldap.ServerSearchResult{Entries: nil, Referrals: []string{}, Controls: []ldap.Control{}, ResultCode: ldap.LDAPResultOperationsError}, nil
 }
-
-/*func getAzureFieldsMap(filter map[string]string) map[string]string {
-	azureFields := make(map[string]string)
-	//log.Printf("%+v", azureFields)
-	for k, v := range filter {
-		for ldap, azure := range appConfig.mapFields {
-			if strings.EqualFold(k, ldap) {
-				azureFields[azure] = v
-				break
-			}
-		}
-	}
-
-	return azureFields
-}*/
 
 func getAzureField(ldapField string) string {
 	for k, v := range appConfig.mapFields {
@@ -204,62 +181,6 @@ func findUsers(filter []string, searchType byte) (usersFound []map[string]interf
 	return
 }
 
-/*func findUsers(filter map[string]string, searchType byte) (usersFound []map[string]interface{}) {
-	log.Print(filter)
-	users, err := getUsersMap()
-	if err == nil {
-		for _, v := range users {
-			found := false
-			for k, f := range filter {
-				fieldValueAux, ok := v[k]
-				if ok {
-					fieldValue := ""
-					if fieldValueAux != nil {
-						fieldValue = fmt.Sprint(fieldValueAux)
-					}
-					lenFilter := len(f)
-					if lenFilter == 1 && f == "*" {
-						found = fieldValue != ""
-					} else if lenFilter > 2 && strings.HasPrefix(f, "*") && strings.HasSuffix(f, "*") {
-						if lenFilter > 2 {
-							f = f[:len(f)-1]
-							f = f[1:]
-							found = strings.Contains(fieldValue, f)
-						}
-					} else if strings.HasPrefix(f, "*") {
-						if lenFilter > 1 {
-							f = f[1:]
-							found = strings.HasSuffix(fieldValue, f)
-						}
-					} else if strings.HasSuffix(f, "*") {
-						if lenFilter > 1 {
-							f = f[:len(f)-1]
-							found = strings.HasPrefix(fieldValue, f)
-						}
-					} else {
-						found = f == fieldValue
-					}
-
-					if searchType == '&' {
-						if !found {
-							break
-						}
-					} else {
-						if found {
-							break
-						}
-					}
-				}
-			}
-			if found {
-				usersFound = append(usersFound, v)
-			}
-		}
-	}
-
-	return
-}*/
-
 func getLDAPFields(azureField string) (ldapFields []string) {
 	for k, v := range appConfig.mapFields {
 		if v == azureField {
@@ -308,20 +229,6 @@ func buildReqAttributesList(filter string, filters []string) []string {
 	return filters
 }
 
-/*func buildReqAttributesMap(filter string) (attrMap map[string]string) {
-	attrList := buildReqAttributesList(filter, []string{})
-	log.Print(attrList)
-	attrMap = make(map[string]string)
-	for _, v := range attrList {
-		f := strings.Split(v, "=")
-		if len(f) > 1 {
-			attrMap[f[0]] = f[1]
-		}
-	}
-
-	return
-}*/
-
 func getDN(domain string) (baseDN string) {
 	if domain != "" {
 		domainParts := strings.Split(domain, ".")
@@ -336,7 +243,7 @@ func getDN(domain string) (baseDN string) {
 
 func getUsernameDomain(mail string) (user, domain string) {
 	mailSlice := strings.Split(mail, "@")
-	if len(mailSlice) == 2 {
+	if len(mailSlice) == 2 && mailSlice[0] != "" && mailSlice[1] != "" {
 		user = mailSlice[0]
 		domain = mailSlice[1]
 	}

@@ -11,8 +11,6 @@ var appConfig configType
 
 func main() {
 	appConfig = getConfig()
-	//log.Printf("%+v", appConfig)
-	//os.Exit(1)
 
 	s := ldap.NewServer()
 	handler := ldapHandler{}

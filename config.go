@@ -29,7 +29,6 @@ type configType struct {
 	LDAP      ldapConfigType      `yaml:"LDAP"`
 	MapAux    []map[string]string `yaml:"Mapping"`
 	mapFields map[string]string   // key ldapfield, value azureField
-	//mapFields map[string][]string
 }
 
 func getConfig() (t configType) {
