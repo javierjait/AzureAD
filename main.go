@@ -10,16 +10,16 @@ import (
 var appConfig configType
 
 func main() {
-	appConfig = getConfig()
+	appConfig = getConfig() // Lee configuración
 
-	s := ldap.NewServer()
-	handler := ldapHandler{}
+	s := ldap.NewServer()    // Crea el LDAP server
+	handler := ldapHandler{} // Initializa el handler
 	s.BindFunc("", handler)
 	s.SearchFunc("", handler)
 	s.UnbindFunc("", handler)
 	s.CloseFunc("", handler)
 
-	if appConfig.LDAP.Secure {
+	if appConfig.LDAP.Secure { // Si es LDAP secure
 		if err := s.ListenAndServeTLS(fmt.Sprintf(":%d", appConfig.LDAP.Port), fmt.Sprintf("%scert.pem", appConfig.LDAP.CertificateDirectory), fmt.Sprintf("%skey.pem", appConfig.LDAP.CertificateDirectory)); err != nil {
 			log.Fatalf("LDAP Server Failed: %s", err.Error())
 		}

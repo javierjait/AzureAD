@@ -4,6 +4,7 @@
 *.yaml
 *.json
 *.cmd
+*.ps1
 *.zip
 azuread
 

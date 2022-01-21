@@ -15,6 +15,7 @@ type azureConfigType struct {
 	ApplicationID string `yaml:"ApplicationId"`
 	ClientSecret  string `yaml:"ClientSecret"`
 	Cache         int    `yaml:"CacheMinutes"`
+	BindingUser   string `yaml:"BindingUser"`
 }
 
 type ldapConfigType struct {
@@ -31,6 +32,8 @@ type configType struct {
 	mapFields map[string]string   // key ldapfield, value azureField
 }
 
+// getConfig
+// Lee la configuracion del archivo yaml y la valida
 func getConfig() (t configType) {
 	t = readConfig()
 
@@ -46,6 +49,8 @@ func getConfig() (t configType) {
 	return
 }
 
+// readConfig
+// Lee la configuración del archivo yaml y realiza la serialización
 func readConfig() (t configType) {
 	data, err := os.ReadFile("config.yaml")
 	checkError(err)
@@ -56,39 +61,45 @@ func readConfig() (t configType) {
 	return
 }
 
+// validateConfig
+// Valida los datos de la configuración
 func validateConfig(t *configType) {
 	validateAzure(t)
 	validateLDAP(t)
 }
 
+// validateAzure
+// Valida los datos de azure
 func validateAzure(t *configType) {
-	if t.Azure.ApplicationID == "" {
+	if t.Azure.ApplicationID == "" { // Si ApplicationID es vacío, indica error
 		checkError(errors.New("invalid applicationId"))
 	}
 
-	if t.Azure.TenantID == "" || t.Azure.ClientSecret == "" {
+	if t.Azure.TenantID == "" || t.Azure.ClientSecret == "" { // Si TenantID o ClientSecret es vacío, indica error
 		checkError(errors.New("invalid tenant or client secret"))
 	}
 
-	if t.Azure.Cache < 0 {
+	if t.Azure.Cache < 0 { // El cache tiene que ser mayor o igual que 0
 		t.Azure.Cache = 0
 	}
 
-	if t.Azure.Cache > 1440 {
+	if t.Azure.Cache > 1440 { // El cache tiene que ser menor a 1440 minutos
 		t.Azure.Cache = 1440
 	}
 
-	_, err := graphClient(t.Azure)
+	_, err := graphClient(t.Azure) // Valida el cliente azure
 	checkError(err)
 }
 
+// validateLDAP
+// validad los datos del servidor LDAP
 func validateLDAP(t *configType) {
 	// Check LDAP port
-	if t.LDAP.Port == 0 {
+	if t.LDAP.Port == 0 { // Si el puerto es 0, pone los puertos predeterminados
 		if t.LDAP.Secure {
-			t.LDAP.Port = 636
+			t.LDAP.Port = 636 // Puerto seguro predeterminado
 		} else {
-			t.LDAP.Port = 389
+			t.LDAP.Port = 389 // Puerto básico predeterminado
 		}
 	}
 
@@ -98,23 +109,25 @@ func validateLDAP(t *configType) {
 			t.LDAP.CertificateDirectory += "/"
 		}
 
-		if _, err := os.Stat(t.LDAP.CertificateDirectory); err != nil {
+		if _, err := os.Stat(t.LDAP.CertificateDirectory); err != nil { // Verifica que la carpeta exista
 			checkError(errors.New("certificate directory not found"))
 		}
 
-		if _, err := os.Stat(t.LDAP.CertificateDirectory + "cert.pem"); err != nil {
+		if _, err := os.Stat(t.LDAP.CertificateDirectory + "cert.pem"); err != nil { // Verifica que el archivo cert.pem exista
 			checkError(errors.New("certificate not found"))
 		}
 
-		if _, err := os.Stat(t.LDAP.CertificateDirectory + "key.pem"); err != nil {
+		if _, err := os.Stat(t.LDAP.CertificateDirectory + "key.pem"); err != nil { // Verifica que el archivo key.pem exista
 			checkError(errors.New("private key not found"))
 		}
 	}
 }
 
+// checkError
+// Agrega el error al log, lo muestra y cierra la aplicación
 func checkError(err error) {
-	if err != nil {
-		util.AddToLog("error", err.Error())
-		log.Fatal(err)
+	if err != nil { // si hay error
+		util.AddToLog("error", err.Error()) // Lo agrega al archivo de log
+		log.Fatal(err)                      // Muestra el error en consola y cierra
 	}
 }
