@@ -7,5 +7,4 @@
 *.ps1
 *.zip
 azuread
-
-#vendor/
+vendor/
